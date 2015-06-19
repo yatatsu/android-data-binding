@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">try-data-binding</string>
+
+    <string name="retry_label">再試行</string>
+
+    <string name="memo_title_ipsum">ポラーノの広場</string>
+    <string name="memo_body_ipsum">あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。</string>
+</resources>
