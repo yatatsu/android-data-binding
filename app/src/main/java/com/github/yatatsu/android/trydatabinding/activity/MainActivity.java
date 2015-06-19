@@ -1,6 +1,7 @@
 package com.github.yatatsu.android.trydatabinding.activity;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -15,9 +16,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.yatatsu.android.trydatabinding.BR;
 import com.github.yatatsu.android.trydatabinding.R;
 import com.github.yatatsu.android.trydatabinding.ServiceException;
 import com.github.yatatsu.android.trydatabinding.api.MemoApiClient;
+import com.github.yatatsu.android.trydatabinding.databinding.ListItemBinding;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
 
 import java.util.ArrayList;
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    static class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.ViewHolder> {
+    static class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.BindingHolder> {
 
         @NonNull private final List<Memo> dataSource = new ArrayList<>();
 
@@ -110,17 +113,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = layoutInflater.inflate(R.layout.list_item, parent, false);
-            return new ViewHolder(view);
+        public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            ListItemBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.list_item, parent, false);
+            return new BindingHolder(binding);
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(BindingHolder holder, int position) {
             Memo memo = dataSource.get(position);
-            holder.titleView.setText(memo.getTitle());
-            holder.bodyView.setText(memo.getBody());
-            holder.countView.setText("閲覧回数 " + memo.getViews() + "回");
+            holder.binding.setVariable(BR.memo, memo);
+            holder.binding.executePendingBindings();
         }
 
         @Override
@@ -128,16 +130,19 @@ public class MainActivity extends AppCompatActivity {
             return dataSource.size();
         }
 
-        static class ViewHolder extends RecyclerView.ViewHolder {
+        static class BindingHolder extends RecyclerView.ViewHolder {
             public final TextView titleView;
             public final TextView bodyView;
             public final TextView countView;
+            public final ListItemBinding binding;
 
-            public ViewHolder(View view) {
-                super(view);
+            public BindingHolder(ListItemBinding binding) {
+                super(binding.getRoot());
+                View view = binding.getRoot();
                 this.titleView = (TextView) view.findViewById(R.id.memo_title);
                 this.bodyView = (TextView) view.findViewById(R.id.memo_body);
                 this.countView = (TextView) view.findViewById(R.id.memo_count);
+                this.binding = binding;
             }
         }
     }
