@@ -1,15 +1,30 @@
 package com.github.yatatsu.android.trydatabinding.model;
 
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
+import com.github.yatatsu.android.trydatabinding.BR;
+
+import java.io.Serializable;
+
 /**
  * メモのモデル
  */
-public class Memo {
+public class Memo extends BaseObservable implements Serializable {
 
     public enum Status {
         NotYet,
-        Done,
         Archived,
+        ;
+    }
+
+    public enum Operation {
+        Create,
+        Update,
+        Delete,
         ;
     }
 
@@ -18,6 +33,12 @@ public class Memo {
         this.views = 0;
     }
 
+    @NonNull
+    public static Memo newInstance() {
+        return newInstance(null, null);
+    }
+
+    @NonNull
     public static Memo newInstance(String title, String body) {
         Memo item = new Memo();
         item.setTitle(title);
@@ -30,6 +51,7 @@ public class Memo {
     private Status status;
     private int views;
 
+    @Bindable
     public String getTitle() {
         return title;
     }
@@ -38,6 +60,7 @@ public class Memo {
         this.title = title;
     }
 
+    @Bindable
     public String getBody() {
         return body;
     }
@@ -46,12 +69,14 @@ public class Memo {
         this.body = body;
     }
 
+    @Bindable
     public Status getStatus() {
         return status;
     }
 
     public void setStatus(Status status) {
         this.status = status;
+        notifyPropertyChanged(BR.status);
     }
 
     public int getViews() {
@@ -60,5 +85,9 @@ public class Memo {
 
     public void setViews(int views) {
         this.views = views;
+    }
+
+    public boolean isInvalid() {
+        return TextUtils.isEmpty(title) || TextUtils.isEmpty(body);
     }
 }

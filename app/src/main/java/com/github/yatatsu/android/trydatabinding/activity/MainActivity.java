@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,21 +22,22 @@ import com.github.yatatsu.android.trydatabinding.R;
 import com.github.yatatsu.android.trydatabinding.ServiceException;
 import com.github.yatatsu.android.trydatabinding.api.MemoApiClient;
 import com.github.yatatsu.android.trydatabinding.databinding.ListItemBinding;
+import com.github.yatatsu.android.trydatabinding.fragment.EditItemFragment;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 一覧画面
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EditItemFragment.EditItemActionListener {
 
     private SwipeRefreshLayout swipeContainer;
     private MemoAdapter memoAdapter;
     private ProgressBar progressBar;
     private MemoApiClient apiClient = new MemoApiClient();
     private static final String TAG = "MainActivity";
+    private static final String FRAGMENT_TAG = "FRAGMENT_TAG";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,12 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         memoAdapter = new MemoAdapter(this);
+        memoAdapter.setOnClickItemViewListener(new MemoAdapter.OnClickItemViewListener() {
+            @Override
+            public void onClickItemView(View view, Memo memo, int key) {
+                EditItemFragment.newInstance(memo, key).show(getFragmentManager(), FRAGMENT_TAG);
+            }
+        });
         recyclerView.setAdapter(memoAdapter);
     }
 
@@ -95,21 +103,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onCompleteEditItem(@NonNull Memo memo, int key) {
+        Log.d(TAG, "onCompleteEditItem");
+        if (memoAdapter == null) {
+            return;
+        }
+        if (key > 0) {
+            memoAdapter.getDataSource().put(key, memo);
+            memoAdapter.notifyItemChanged(key);
+        }
+    }
+
     static class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.BindingHolder> {
 
-        @NonNull private final List<Memo> dataSource = new ArrayList<>();
+        interface OnClickItemViewListener {
+            void onClickItemView(View view, Memo memo, int key);
+        }
 
+        @NonNull private final SparseArray<Memo> dataSource = new SparseArray<>();
         private final LayoutInflater layoutInflater;
+        private OnClickItemViewListener listener;
 
         public MemoAdapter(Context context) {
             super();
             layoutInflater = LayoutInflater.from(context);
         }
 
+        public void setOnClickItemViewListener(OnClickItemViewListener listener) {
+            this.listener = listener;
+        }
+
         public void setDataSource(@NonNull List<Memo> dataSource) {
             this.dataSource.clear();
-            this.dataSource.addAll(dataSource);
+            int i = 0;
+            for (Memo item : dataSource) {
+                this.dataSource.append(i, item);
+                i++;
+            }
             notifyDataSetChanged();
+        }
+
+        @NonNull
+        public SparseArray<Memo> getDataSource() {
+            return dataSource;
         }
 
         @Override
@@ -119,8 +156,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(BindingHolder holder, int position) {
-            Memo memo = dataSource.get(position);
+        public void onBindViewHolder(BindingHolder holder, final int position) {
+            final Memo memo = dataSource.get(position);
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(@NonNull View view) {
+                    Log.d(TAG, "onClick");
+                    if (listener != null) {
+                        listener.onClickItemView(view, memo, position);
+                    }
+
+                }
+            });
             holder.binding.setVariable(BR.memo, memo);
             holder.binding.executePendingBindings();
         }
@@ -131,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         static class BindingHolder extends RecyclerView.ViewHolder {
+            public final View view;
             public final TextView titleView;
             public final TextView bodyView;
             public final TextView countView;
@@ -139,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
             public BindingHolder(ListItemBinding binding) {
                 super(binding.getRoot());
                 View view = binding.getRoot();
+                this.view = view;
                 this.titleView = (TextView) view.findViewById(R.id.memo_title);
                 this.bodyView = (TextView) view.findViewById(R.id.memo_body);
                 this.countView = (TextView) view.findViewById(R.id.memo_count);

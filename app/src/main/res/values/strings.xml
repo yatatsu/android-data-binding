@@ -5,4 +5,9 @@
 
     <string name="memo_title_ipsum">ポラーノの広場</string>
     <string name="memo_body_ipsum">あのイーハトーヴォのすきとおった風、夏でも底に冷たさをもつ青いそら、うつくしい森で飾られたモリーオ市、郊外のぎらぎらひかる草の波。</string>
+
+    <string name="edit_title_hint">メモのタイトル</string>
+    <string name="edit_body_hint">メモの本文</string>
+    <string name="edit_save">保存</string>
+    <string name="edit_cancel">キャンセル</string>
 </resources>

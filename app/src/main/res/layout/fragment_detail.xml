@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable name="viewModel" type="com.github.yatatsu.android.trydatabinding.viewmodel.EditItemViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Widget.AppCompat.EditText"
+                    android:textSize="16sp"
+                    android:text="@{viewModel.editingMemo.title}"
+                    android:hint="@string/edit_title_hint"
+                    app:addTextChangedListener="@{viewModel.titleWatcher}"
+                    app:onFocusChangeListener="@{viewModel.focusChangeListener}"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <EditText
+                    android:id="@+id/edit_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Widget.AppCompat.EditText"
+                    android:textSize="14sp"
+                    android:text="@{viewModel.editingMemo.body}"
+                    android:hint="@string/edit_body_hint"
+                    app:addTextChangedListener="@{viewModel.bodyWatcher}"
+                    app:onFocusChangeListener="@{viewModel.focusChangeListener}"
+                    />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</layout>
