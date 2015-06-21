@@ -14,13 +14,12 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.github.yatatsu.android.trydatabinding.BR;
 import com.github.yatatsu.android.trydatabinding.R;
 import com.github.yatatsu.android.trydatabinding.ServiceException;
 import com.github.yatatsu.android.trydatabinding.api.MemoApiClient;
+import com.github.yatatsu.android.trydatabinding.databinding.ActivityMainBinding;
 import com.github.yatatsu.android.trydatabinding.databinding.ListItemBinding;
 import com.github.yatatsu.android.trydatabinding.fragment.EditItemFragment;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
@@ -33,10 +32,9 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements EditItemFragment.EditItemActionListener {
 
-    private SwipeRefreshLayout swipeContainer;
     private MemoAdapter memoAdapter;
-    private ProgressBar progressBar;
     private List<Memo> data;
+    private ActivityMainBinding binding;
     private MemoApiClient apiClient = new MemoApiClient();
     private static final String TAG = "MainActivity";
     private static final String FRAGMENT_TAG = "FRAGMENT_TAG";
@@ -45,23 +43,20 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        swipeContainer.setColorSchemeResources(
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding.swipeContainer.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        binding.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 fetchMemosAsync();
             }
         });
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(binding.recyclerView.getContext()));
         memoAdapter = new MemoAdapter(this);
         memoAdapter.setOnClickItemViewListener(new MemoAdapter.OnClickItemViewListener() {
             @Override
@@ -69,13 +64,13 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
                 EditItemFragment.newInstance(memo, key).show(getFragmentManager(), FRAGMENT_TAG);
             }
         });
-        recyclerView.setAdapter(memoAdapter);
+        binding.recyclerView.setAdapter(memoAdapter);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(ARGS_KEY_DATA)) {
             data = savedInstanceState.getParcelableArrayList(ARGS_KEY_DATA);
         }
         if (data == null || data.isEmpty()) {
-            progressBar.setVisibility(View.VISIBLE);
+            binding.progressBar.setVisibility(View.VISIBLE);
             fetchMemosAsync();
         } else {
             memoAdapter.setDataSource(data);
@@ -98,8 +93,8 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
                 }
                 Log.d(TAG, "onSuccess in API");
                 data = memos;
-                progressBar.setVisibility(View.GONE);
-                swipeContainer.setRefreshing(false);
+                binding.progressBar.setVisibility(View.GONE);
+                binding.swipeContainer.setRefreshing(false);
                 memoAdapter.setDataSource(memos);
             }
 
@@ -109,10 +104,10 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
                     return;
                 }
                 Log.d(TAG, "onFailure in API");
-                swipeContainer.setRefreshing(false);
-                progressBar.setVisibility(View.GONE);
+                binding.swipeContainer.setRefreshing(false);
+                binding.progressBar.setVisibility(View.GONE);
                 memoAdapter.setDataSource(new ArrayList<Memo>());
-                Snackbar.make(swipeContainer, e.getMessage(), Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.swipeContainer, e.getMessage(), Snackbar.LENGTH_LONG)
                         .show();
             }
         });
@@ -173,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
         @Override
         public void onBindViewHolder(BindingHolder holder, final int position) {
             final Memo memo = dataSource.get(position);
-            holder.view.setOnClickListener(new View.OnClickListener() {
+            holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(@NonNull View view) {
                     Log.d(TAG, "onClick");
@@ -193,19 +188,10 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
         }
 
         static class BindingHolder extends RecyclerView.ViewHolder {
-            public final View view;
-            public final TextView titleView;
-            public final TextView bodyView;
-            public final TextView countView;
             public final ListItemBinding binding;
 
             public BindingHolder(ListItemBinding binding) {
                 super(binding.getRoot());
-                View view = binding.getRoot();
-                this.view = view;
-                this.titleView = (TextView) view.findViewById(R.id.memo_title);
-                this.bodyView = (TextView) view.findViewById(R.id.memo_body);
-                this.countView = (TextView) view.findViewById(R.id.memo_count);
                 this.binding = binding;
             }
         }
