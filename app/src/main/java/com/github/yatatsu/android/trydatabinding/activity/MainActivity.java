@@ -25,6 +25,7 @@ import com.github.yatatsu.android.trydatabinding.databinding.ListItemBinding;
 import com.github.yatatsu.android.trydatabinding.fragment.EditItemFragment;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,9 +36,11 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
     private SwipeRefreshLayout swipeContainer;
     private MemoAdapter memoAdapter;
     private ProgressBar progressBar;
+    private List<Memo> data;
     private MemoApiClient apiClient = new MemoApiClient();
     private static final String TAG = "MainActivity";
     private static final String FRAGMENT_TAG = "FRAGMENT_TAG";
+    private static final String ARGS_KEY_DATA = "ARGS_KEY_DATA";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,12 +70,22 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
             }
         });
         recyclerView.setAdapter(memoAdapter);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(ARGS_KEY_DATA)) {
+            data = savedInstanceState.getParcelableArrayList(ARGS_KEY_DATA);
+        }
+        if (data == null || data.isEmpty()) {
+            progressBar.setVisibility(View.VISIBLE);
+            fetchMemosAsync();
+        } else {
+            memoAdapter.setDataSource(data);
+        }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        fetchMemosAsync();
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(ARGS_KEY_DATA, (ArrayList<Memo>) data);
     }
 
     private void fetchMemosAsync() {
@@ -84,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
                     return;
                 }
                 Log.d(TAG, "onSuccess in API");
+                data = memos;
                 progressBar.setVisibility(View.GONE);
                 swipeContainer.setRefreshing(false);
                 memoAdapter.setDataSource(memos);
@@ -97,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
                 Log.d(TAG, "onFailure in API");
                 swipeContainer.setRefreshing(false);
                 progressBar.setVisibility(View.GONE);
+                memoAdapter.setDataSource(new ArrayList<Memo>());
                 Snackbar.make(swipeContainer, e.getMessage(), Snackbar.LENGTH_LONG)
                         .show();
             }
