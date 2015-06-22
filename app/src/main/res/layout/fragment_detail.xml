@@ -17,7 +17,9 @@
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorEnabled="true"
+                app:error="@{viewModel.titleError}">
 
                 <EditText
                     android:id="@+id/edit_title"
@@ -28,7 +30,7 @@
                     android:text="@{viewModel.editingMemo.title}"
                     android:hint="@string/edit_title_hint"
                     app:addTextChangedListener="@{viewModel.titleWatcher}"
-                    app:onFocusChangeListener="@{viewModel.focusChangeListener}"
+                    app:onFocusChangeListener="@{viewModel.titleFocusChangeListener}"
                     />
 
             </android.support.design.widget.TextInputLayout>
@@ -36,7 +38,9 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="16dp"
+                app:errorEnabled="true"
+                app:error="@{viewModel.bodyError}">
 
                 <EditText
                     android:id="@+id/edit_body"
@@ -47,7 +51,7 @@
                     android:text="@{viewModel.editingMemo.body}"
                     android:hint="@string/edit_body_hint"
                     app:addTextChangedListener="@{viewModel.bodyWatcher}"
-                    app:onFocusChangeListener="@{viewModel.focusChangeListener}"
+                    app:onFocusChangeListener="@{viewModel.bodyFocusChangeListener}"
                     />
 
             </android.support.design.widget.TextInputLayout>

@@ -10,4 +10,7 @@
     <string name="edit_body_hint">メモの本文</string>
     <string name="edit_save">保存</string>
     <string name="edit_cancel">キャンセル</string>
+
+    <string name="empty_text_warning">未入力の場合は保存されません。</string>
+    <string name="not_saved">保存されませんでした。</string>
 </resources>

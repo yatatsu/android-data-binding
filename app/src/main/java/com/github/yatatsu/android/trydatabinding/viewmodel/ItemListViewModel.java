@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.github.yatatsu.android.trydatabinding.BR;
+import com.github.yatatsu.android.trydatabinding.R;
 import com.github.yatatsu.android.trydatabinding.ServiceException;
 import com.github.yatatsu.android.trydatabinding.api.MemoApiClient;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
@@ -31,7 +32,7 @@ public class ItemListViewModel extends BaseObservable {
     private final FragmentManager fragmentManager;
     private final MemoApiClient apiClient;
     public final MemoListAdapter adapter;
-    private final Snackbar snackbar;
+    public final Snackbar snackbar;
     private boolean destroyed;
     private boolean visibleProgressBar;
     private boolean refreshing;
@@ -56,7 +57,7 @@ public class ItemListViewModel extends BaseObservable {
         adapter.setOnClickItemViewListener(new MemoListAdapter.OnClickItemViewListener() {
             @Override
             public void onClickItemView(View view, Memo memo, int key) {
-                EditItemFragment.newInstance(memo, key).show(fragmentManager, FRAGMENT_TAG);
+                EditItemFragment.newInstance(memo.copy(), key).show(fragmentManager, FRAGMENT_TAG);
             }
         });
         if (savedInstanceState != null && savedInstanceState.containsKey(ARGS_KEY_DATA)) {
@@ -159,7 +160,9 @@ public class ItemListViewModel extends BaseObservable {
 
     public void onCompleteEditItem(@NonNull Memo memo, int key) {
         Log.d(TAG, "onCompleteEditItem key:" + key + " memo:" + memo.getTitle() + "/" + memo.getBody());
-        if (key >= 0) {
+        if (memo.isInvalid()) {
+            snackbar.setText(R.string.not_saved).show();
+        } else if (key >= 0) {
             adapter.getDataSource().put(key, memo);
             adapter.notifyItemChanged(key);
         }

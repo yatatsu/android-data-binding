@@ -23,13 +23,6 @@ public class Memo extends BaseObservable implements Serializable, Parcelable {
         ;
     }
 
-    public enum Operation {
-        Create,
-        Update,
-        Delete,
-        ;
-    }
-
     public Memo() {
         this.status = Status.NotYet;
         this.views = 0;
@@ -125,5 +118,12 @@ public class Memo extends BaseObservable implements Serializable, Parcelable {
         out.writeString(body);
         out.writeInt(status.ordinal());
         out.writeInt(views);
+    }
+
+    public Memo copy() {
+        Memo copy = newInstance(title, body);
+        copy.setStatus(status);
+        copy.setViews(views);
+        return copy;
     }
 }

@@ -116,10 +116,7 @@ public class EditItemFragment extends DialogFragment {
         if (args != null && args.containsKey(ARGS_KEY_MEMO)) {
             targetMemo = (Memo) args.getSerializable(ARGS_KEY_MEMO);
         }
-        if (targetMemo == null) {
-            targetMemo = Memo.newInstance();
-        }
-        return targetMemo;
+        return targetMemo == null ? Memo.newInstance() : targetMemo;
     }
 
     private int grubTargetKey(Bundle savedInstanceState) {
