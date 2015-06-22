@@ -1,4 +1,4 @@
-package com.github.yatatsu.android.trydatabinding.fragment;
+package com.github.yatatsu.android.trydatabinding.view;
 
 import android.app.Activity;
 import android.app.Dialog;
