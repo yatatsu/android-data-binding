@@ -21,6 +21,7 @@ import com.github.yatatsu.android.trydatabinding.api.MemoApiClient;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
 import com.github.yatatsu.android.trydatabinding.view.EditItemFragment;
 import com.github.yatatsu.android.trydatabinding.view.MemoListAdapter;
+import com.github.yatatsu.android.trydatabinding.view.SnackbarCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ItemListViewModel extends BaseObservable {
     private final FragmentManager fragmentManager;
     private final MemoApiClient apiClient;
     public final MemoListAdapter adapter;
-    public final Snackbar snackbar;
+    public final SnackbarCallback snackbarCallback;
     private boolean destroyed;
     private boolean visibleProgressBar;
     private boolean refreshing;
@@ -43,13 +44,13 @@ public class ItemListViewModel extends BaseObservable {
     private static final String FRAGMENT_TAG = "FRAGMENT_TAG";
     private static final String TAG = "ItemListViewModel";
 
-    public ItemListViewModel(Context context, FragmentManager fragmentManager, Snackbar snackbar) {
+    public ItemListViewModel(Context context, FragmentManager fragmentManager, SnackbarCallback snackbarCallback) {
         super();
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.apiClient = new MemoApiClient();
         this.adapter = new MemoListAdapter(context);
-        this.snackbar = snackbar;
+        this.snackbarCallback = snackbarCallback;
         this.destroyed = false;
     }
 
@@ -153,7 +154,7 @@ public class ItemListViewModel extends BaseObservable {
                 setRefreshing(false);
                 setVisibleProgressBar(false);
                 adapter.setDataSource(new ArrayList<Memo>());
-                snackbar.setText(e.getMessage()).show();
+                snackbarCallback.show(e.getMessage(), Snackbar.LENGTH_LONG);
             }
         });
     }
@@ -161,7 +162,7 @@ public class ItemListViewModel extends BaseObservable {
     public void onCompleteEditItem(@NonNull Memo memo, int key) {
         Log.d(TAG, "onCompleteEditItem key:" + key + " memo:" + memo.getTitle() + "/" + memo.getBody());
         if (memo.isInvalid()) {
-            snackbar.setText(R.string.not_saved).show();
+            snackbarCallback.show(context.getString(R.string.not_saved), Snackbar.LENGTH_LONG);
         } else if (key >= 0) {
             adapter.getDataSource().put(key, memo);
             adapter.notifyItemChanged(key);
