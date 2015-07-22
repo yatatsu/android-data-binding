@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements EditItemFragment.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        ItemListViewModel viewModel = new ItemListViewModel(this, getFragmentManager(), new SnackbarCallback() {
+        ItemListViewModel viewModel = new ItemListViewModel(this, getFragmentManager(), new SnackBarCallback() {
             @Override
             public void show(String message, int duration) {
                 Snackbar.make(binding.swipeContainer, message, duration).show();

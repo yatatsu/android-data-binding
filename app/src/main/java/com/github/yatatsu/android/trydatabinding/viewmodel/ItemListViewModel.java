@@ -21,7 +21,7 @@ import com.github.yatatsu.android.trydatabinding.api.MemoApiClient;
 import com.github.yatatsu.android.trydatabinding.model.Memo;
 import com.github.yatatsu.android.trydatabinding.view.EditItemFragment;
 import com.github.yatatsu.android.trydatabinding.view.MemoListAdapter;
-import com.github.yatatsu.android.trydatabinding.view.SnackbarCallback;
+import com.github.yatatsu.android.trydatabinding.view.SnackBarCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class ItemListViewModel extends BaseObservable {
     private final FragmentManager fragmentManager;
     private final MemoApiClient apiClient;
     public final MemoListAdapter adapter;
-    public final SnackbarCallback snackbarCallback;
+    public final SnackBarCallback snackBarCallback;
     private boolean destroyed;
     private boolean visibleProgressBar;
     private boolean refreshing;
@@ -44,13 +44,13 @@ public class ItemListViewModel extends BaseObservable {
     private static final String FRAGMENT_TAG = "FRAGMENT_TAG";
     private static final String TAG = "ItemListViewModel";
 
-    public ItemListViewModel(Context context, FragmentManager fragmentManager, SnackbarCallback snackbarCallback) {
+    public ItemListViewModel(Context context, FragmentManager fragmentManager, SnackBarCallback snackBarCallback) {
         super();
         this.context = context;
         this.fragmentManager = fragmentManager;
         this.apiClient = new MemoApiClient();
         this.adapter = new MemoListAdapter(context);
-        this.snackbarCallback = snackbarCallback;
+        this.snackBarCallback = snackBarCallback;
         this.destroyed = false;
     }
 
@@ -154,7 +154,7 @@ public class ItemListViewModel extends BaseObservable {
                 setRefreshing(false);
                 setVisibleProgressBar(false);
                 adapter.setDataSource(new ArrayList<Memo>());
-                snackbarCallback.show(e.getMessage(), Snackbar.LENGTH_LONG);
+                snackBarCallback.show(e.getMessage(), Snackbar.LENGTH_LONG);
             }
         });
     }
@@ -162,7 +162,7 @@ public class ItemListViewModel extends BaseObservable {
     public void onCompleteEditItem(@NonNull Memo memo, int key) {
         Log.d(TAG, "onCompleteEditItem key:" + key + " memo:" + memo.getTitle() + "/" + memo.getBody());
         if (memo.isInvalid()) {
-            snackbarCallback.show(context.getString(R.string.not_saved), Snackbar.LENGTH_LONG);
+            snackBarCallback.show(context.getString(R.string.not_saved), Snackbar.LENGTH_LONG);
         } else if (key >= 0) {
             adapter.getDataSource().put(key, memo);
             adapter.notifyItemChanged(key);
