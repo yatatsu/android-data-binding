@@ -26,7 +26,7 @@ import com.github.yatatsu.android.trydatabinding.view.SnackBarCallback;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@SuppressWarnings("unused") // invoked from dataBinding
 public class ItemListViewModel extends BaseObservable {
 
     private final Context context;
